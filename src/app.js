@@ -14,7 +14,7 @@ const initialGeometry = () => ({
 const app = document.querySelector('#app');
 const state = {
   screen: 'home', lesson: lessons[0], activeTool: 'move', reflection: '', helpOpen: false,
-  geometry: initialGeometry(), strokes: [], history: [], pointerSession: null, resizeObserver: null,
+  geometry: initialGeometry(), strokes: [], history: [], pointerSession: null, resizeObserver: null, stageSize: null,
 };
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -69,7 +69,7 @@ function renderHelpDialog() {
 }
 
 function renderSummary() {
-  return `<section class="app-shell summary"><div class="topbar"><button class="back" data-action="go-work">← もどる</button></div><div class="summary__body"><p class="eyebrow">まとめ</p><h2>分かったことを<br>書こう</h2><p class="prompt">${state.lesson.reflectionPrompt}</p><textarea id="reflection" maxlength="240" placeholder="たとえば、中心から…">${escapeHtml(state.reflection)}</textarea></div><button class="primary" data-action="finish">おわる</button></section>`;
+  return `<section class="app-shell summary"><div class="topbar"><button class="back" data-action="go-work">← もどる</button></div><div class="summary__body"><p class="eyebrow">まとめ</p><h2>分かったことを<br>書こう</h2><p class="prompt">${state.lesson.reflectionPrompt}</p><textarea id="reflection" maxlength="240" placeholder="たとえば、中心から…">${escapeHtml(state.reflection)}</textarea></div><div class="summary__actions"><button class="secondary" data-action="save-image">えを保存</button><button class="primary" data-action="finish">おわる</button></div></section>`;
 }
 
 function bindEvents() {
@@ -83,6 +83,8 @@ function setupWorkSurface() {
   const stage = document.querySelector('#stage');
   const svg = document.querySelector('#geometry-svg');
   const canvas = document.querySelector('#ink-canvas');
+  const stageRect = stage.getBoundingClientRect();
+  state.stageSize = { width: stageRect.width, height: stageRect.height };
   resizeAndDrawInk(canvas);
   state.resizeObserver = new ResizeObserver(() => resizeAndDrawInk(canvas));
   state.resizeObserver.observe(stage);
@@ -211,6 +213,38 @@ function undo() {
   state.strokes = state.strokes.slice(0, previous.strokeCount);
 }
 
+function exportImage() {
+  const { center, radiusPoint, probe } = state.geometry;
+  const radius = distance(center, radiusPoint);
+  const onCircle = Math.abs(distance(center, probe) - radius) < 12;
+  const style = '<style>.guide-line{stroke:#8faeb8;stroke-width:4;stroke-dasharray:9 9}.circle-line{fill:#dceef352;stroke:#4b7c8c;stroke-width:5}.handle{stroke:#fff;stroke-width:4}.handle--centre{fill:#f3bf51}.handle--radius{fill:#4b7c8c}.probe{fill:#8eb766;stroke:#fff;stroke-width:4}.probe--on-circle{fill:#db8a4e}</style>';
+  const markup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BOX.width} ${BOX.height}">${style}<rect width="700" height="460" fill="white"/><line class="guide-line" x1="${center.x}" y1="${center.y}" x2="${radiusPoint.x}" y2="${radiusPoint.y}"/><circle class="circle-line" cx="${center.x}" cy="${center.y}" r="${radius}"/><circle class="handle handle--centre" cx="${center.x}" cy="${center.y}" r="16"/><circle class="handle handle--radius" cx="${radiusPoint.x}" cy="${radiusPoint.y}" r="16"/><circle class="probe ${onCircle ? 'probe--on-circle' : ''}" cx="${probe.x}" cy="${probe.y}" r="15"/></svg>`;
+  const source = new Blob([markup], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(source);
+  const image = new Image();
+  image.onload = () => {
+    const output = document.createElement('canvas');
+    output.width = 1400; output.height = 920;
+    const context = output.getContext('2d');
+    context.fillStyle = '#ffffff'; context.fillRect(0, 0, output.width, output.height);
+    context.drawImage(image, 0, 0, output.width, output.height);
+    const size = state.stageSize ?? { width: output.width, height: output.height };
+    context.lineCap = 'round'; context.lineJoin = 'round'; context.lineWidth = 8; context.strokeStyle = '#24343b';
+    state.strokes.forEach((stroke) => {
+      if (!stroke.length) return;
+      context.beginPath();
+      stroke.forEach((point, index) => index ? context.lineTo(point.x * output.width / size.width, point.y * output.height / size.height) : context.moveTo(point.x * output.width / size.width, point.y * output.height / size.height));
+      context.stroke();
+    });
+    const link = document.createElement('a');
+    link.download = 'enno-himitsu.png';
+    link.href = output.toDataURL('image/png');
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  image.src = url;
+}
+
 function handleAction(dataset) {
   switch (dataset.action) {
     case 'open-lesson': state.lesson = lessons.find((lesson) => lesson.id === dataset.lessonId) ?? lessons[0]; state.screen = 'intro'; break;
@@ -221,6 +255,7 @@ function handleAction(dataset) {
     case 'go-summary': state.screen = 'summary'; break;
     case 'tool': state.activeTool = dataset.tool; break;
     case 'undo': undo(); break;
+    case 'save-image': exportImage(); return;
     case 'open-help': state.helpOpen = true; break;
     case 'close-help': state.helpOpen = false; break;
     case 'finish': localStorage.setItem(`geometry-lab:${state.lesson.id}:reflection`, state.reflection); window.alert('まとめを この端末に 保存したよ。'); state.screen = 'home'; break;
