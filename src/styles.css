@@ -133,7 +133,7 @@ h2 { margin-bottom: 10px; font-size: clamp(1.55rem, 6vw, 2.2rem); line-height: 1
 .stage__ink { pointer-events: none; touch-action: none; }
 .stage--pen .stage__svg { pointer-events: none; }
 .stage--pen .stage__ink { pointer-events: auto; cursor: crosshair; }
-.guide-line { stroke: #8faeb8; stroke-width: 4; stroke-dasharray: 9 9; }
+.guide-line { stroke: #8faeb8; stroke-width: 4; stroke-dasharray: 9 9; pointer-events: none; }
 .circle-line { fill: rgba(220, 238, 243, 0.32); stroke: var(--sky-deep); stroke-width: 5; cursor: grab; }
 .circle-line:active { cursor: grabbing; }
 .handle { stroke: var(--surface); stroke-width: 4; cursor: grab; }
@@ -155,6 +155,7 @@ h2 { margin-bottom: 10px; font-size: clamp(1.55rem, 6vw, 2.2rem); line-height: 1
   color: var(--subtle);
   font-size: 0.94rem;
   line-height: 1.5;
+  pointer-events: none;
 }
 
 .tool-dock {
