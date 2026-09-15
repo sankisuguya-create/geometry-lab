@@ -106,6 +106,8 @@ h2 { margin-bottom: 10px; font-size: clamp(1.55rem, 6vw, 2.2rem); line-height: 1
 .secondary { background: var(--surface); border: 1px solid var(--line); }
 
 .work { gap: 18px; padding-bottom: 104px; }
+.work.psychedelic { background: var(--psy-bg); color: var(--psy-text); }
+.work.psychedelic .work__question { color: var(--psy-text); }
 .work__question { margin: 8px 4px 0; font-size: clamp(1.2rem, 5vw, 1.65rem); font-weight: 800; line-height: 1.55; }
 
 .stage {
@@ -115,8 +117,8 @@ h2 { margin-bottom: 10px; font-size: clamp(1.55rem, 6vw, 2.2rem); line-height: 1
   overflow: hidden;
   border: 2px solid var(--line);
   border-radius: 24px;
-  background-color: var(--surface);
-  background-image: radial-gradient(circle, #dce5e2 1px, transparent 1.5px);
+  background-color: var(--psy-bg, var(--surface));
+  background-image: radial-gradient(circle, rgba(255,255,255,.24) 1px, transparent 1.5px);
   background-size: 22px 22px;
   touch-action: none;
 }
@@ -133,17 +135,17 @@ h2 { margin-bottom: 10px; font-size: clamp(1.55rem, 6vw, 2.2rem); line-height: 1
 .stage__ink { pointer-events: none; touch-action: none; }
 .stage--pen .stage__svg { pointer-events: none; }
 .stage--pen .stage__ink { pointer-events: auto; cursor: crosshair; }
-.radius-arm { stroke: var(--sky-deep); stroke-width: 9; stroke-linecap: round; cursor: grab; }
+.radius-arm { stroke: var(--psy-arm, var(--sky-deep)); stroke-width: 9; stroke-linecap: round; cursor: crosshair; }
 .radius-arm:active { cursor: grabbing; }
-.placed-dot { fill: #db8a4e; stroke: var(--surface); stroke-width: 4; }
+.placed-dot { fill: var(--psy-point, #db8a4e); stroke: #fff; stroke-width: 4; }
 .revealed-circle { fill: none; stroke: var(--sky-deep); stroke-width: 4; stroke-dasharray: 11 10; }
 .guide-line { stroke: #8faeb8; stroke-width: 4; stroke-dasharray: 9 9; pointer-events: none; }
 .circle-line { fill: rgba(220, 238, 243, 0.32); stroke: var(--sky-deep); stroke-width: 5; cursor: grab; }
 .circle-line:active { cursor: grabbing; }
 .handle { stroke: var(--surface); stroke-width: 4; cursor: grab; }
 .handle:active, .probe:active { cursor: grabbing; }
-.handle--centre { fill: var(--sun); }
-.handle--radius { fill: #4b7c8c; }
+.handle--centre { fill: var(--psy-point, var(--sun)); }
+.handle--radius { fill: var(--psy-arm, #4b7c8c); }
 .probe { fill: #8eb766; stroke: var(--surface); stroke-width: 4; cursor: grab; }
 .probe--on-circle { fill: #db8a4e; }
 
@@ -161,6 +163,11 @@ h2 { margin-bottom: 10px; font-size: clamp(1.55rem, 6vw, 2.2rem); line-height: 1
   line-height: 1.5;
   pointer-events: none;
 }
+
+.stage__count { position: absolute; left: 18px; bottom: 14px; margin: 0; color: var(--psy-text, var(--ink)); font-weight: 800; pointer-events: none; }
+.enter-hint { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); display: grid; gap: 2px; min-width: 148px; padding: 16px 14px; border: 3px solid var(--psy-point); border-radius: 18px; background: rgba(0,0,0,.22); color: var(--psy-text); text-align: center; pointer-events: none; }
+.enter-hint strong { color: var(--psy-point); font-size: clamp(1.6rem, 5vw, 2.3rem); letter-spacing: .05em; }
+.enter-hint span { font-size: 1.05rem; font-weight: 800; }
 
 .discover-button {
   position: absolute;
