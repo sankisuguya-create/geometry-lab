@@ -135,7 +135,27 @@ function movePointer(event) {
   } else {
     state.geometry.probe = { x: clamp(point.x, 18, BOX.width - 18), y: clamp(point.y, 18, BOX.height - 18) };
   }
-  render();
+  updateGeometrySvg();
+}
+
+function updateGeometrySvg() {
+  const svg = document.querySelector('#geometry-svg');
+  if (!svg) return;
+  const { center, radiusPoint, probe } = state.geometry;
+  const radius = distance(center, radiusPoint);
+  const onCircle = Math.abs(distance(center, probe) - radius) < 12;
+  const guide = svg.querySelector('.guide-line');
+  guide.setAttribute('x1', center.x); guide.setAttribute('y1', center.y);
+  guide.setAttribute('x2', radiusPoint.x); guide.setAttribute('y2', radiusPoint.y);
+  const circle = svg.querySelector('.circle-line');
+  circle.setAttribute('cx', center.x); circle.setAttribute('cy', center.y); circle.setAttribute('r', radius);
+  const centreHandle = svg.querySelector('.handle--centre');
+  centreHandle.setAttribute('cx', center.x); centreHandle.setAttribute('cy', center.y);
+  const radiusHandle = svg.querySelector('.handle--radius');
+  radiusHandle.setAttribute('cx', radiusPoint.x); radiusHandle.setAttribute('cy', radiusPoint.y);
+  const probeElement = svg.querySelector('.probe');
+  probeElement.setAttribute('cx', probe.x); probeElement.setAttribute('cy', probe.y);
+  probeElement.classList.toggle('probe--on-circle', onCircle);
 }
 
 function beginInkStroke(event, canvas) {
