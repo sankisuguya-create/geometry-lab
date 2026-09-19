@@ -22,6 +22,18 @@ body {
   color: var(--ink);
 }
 
+.startup-message {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  padding: 24px;
+  text-align: center;
+  color: var(--subtle);
+  font-weight: 700;
+}
+
+.startup-message p { margin-bottom: 8px; }
+
 button, textarea { font: inherit; }
 
 button {
