@@ -6,13 +6,30 @@
 
 円から球へ学びを広げる授業案と、実物を組み合わせた活用方法は [3年算数「円と球」活用アイデア](docs/grade3-circle-sphere-activity-ideas.md) にまとめています。
 
+## モック版（ブラウザで開くだけ）
+
+`dist/demo.html` をブラウザで開くと、GASへのデプロイなしでそのまま試せます。サーバ・ログイン・外部通信はありません。
+
 ## 開発
 
-依存関係はありません。`index.html` をブラウザで開くか、静的ファイルサーバーで確認してください。
+```
+src/            画面の正（index.html に @include で css/ js/ を差し込む）
+gas/Index.html  Apps Script に貼る画面（build.py が作る生成物）
+dist/demo.html  ブラウザで開くだけのモック（同上）
+tests/          node での検査
+```
+
+```
+python3 build.py           # gas/Index.html と dist/demo.html を作る
+python3 build.py --check   # 生成物が src と一致しているか
+node tests/check.mjs       # 計算・状態遷移・課題データの検査（npm test でも可）
+```
+
+生成物は直接直さず、`src/` を直してから `python3 build.py` を実行してください。
 
 ## Google Apps Script へのデプロイ
 
-`gas/` 内の4ファイルを、拡張子を除いた `Code`、`Index`、`Styles`、`App` という名前で Apps Script プロジェクトへコピーします。変更を反映するときは、**デプロイを管理**から既存デプロイを編集して「新バージョン」を選び、表示中のWebアプリを再読み込みしてください。テスト用デプロイではなく、`/exec` で終わるWebアプリURLを共有します。
+`gas/` の2ファイルを、拡張子を除いた `Code`、`Index` という名前で Apps Script プロジェクトへコピーします（`Index.html` は CSS・JS 内蔵の1枚もの）。変更を反映するときは、**デプロイを管理**から既存デプロイを編集して「新バージョン」を選び、表示中のWebアプリを再読み込みしてください。テスト用デプロイではなく、`/exec` で終わるWebアプリURLを共有します。
 
 ## 現在の段階
 

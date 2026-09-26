@@ -1,0 +1,9 @@
+{
+  "name": "geometry-lab",
+  "private": true,
+  "description": "図形のへんしん実験室。依存なし。検査に node が要る。",
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "python3 build.py --check && node tests/check.mjs"
+  }
+}
