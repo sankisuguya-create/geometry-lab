@@ -188,40 +188,41 @@ SVGを図形に使う理由は、各点・線・円を正確に選択し、条�
 }
 ```
 
-### 5.5 推奨ディレクトリ
+### 5.5 現在のディレクトリ構成
+
+`src/` が正本で、`build.py` が `src/index.html` 内の `/* @include ... */` を展開して、GAS用とモック用の1枚ものHTMLを生成する（兄弟リポジトリの homework-scan / school-timetable と同じ方式）。file:// や GAS で動かす都合上、ブラウザ側の ES Modules は使わず、`<script>` の連結にしている。
 
 ```text
 /
-├─ index.html
+├─ build.py            # 生成＆ --check
 ├─ README.md
 ├─ docs/
 │  └─ figure-learning-lab-handoff.md
 ├─ src/
-│  ├─ app.js
-│  ├─ styles/
-│  │  ├─ tokens.css
-│  │  └─ app.css
-│  ├─ core/
-│  │  ├─ router.js
-│  │  ├─ state.js
-│  │  ├─ history.js
-│  │  ├─ pointer.js
-│  │  ├─ export-image.js
-│  │  └─ ui-shell.js
-│  ├─ modules/
-│  │  ├─ circle/
-│  │  │  ├─ circle-module.js
-│  │  │  ├─ circle-renderer.js
-│  │  │  └─ circle-interactions.js
-│  │  └─ triangle/              # 後から追加
-│  ├─ lessons/
-│  │  └─ grade3-circle.js
-│  └─ assets/
-│     └─ icons/
+│  ├─ index.html       # @include で差し込むテンプレート
+│  ├─ css/
+│  │  ├─ tokens.css    # 変数・要素の土台
+│  │  └─ app.css       # 画面・部品
+│  └─ js/
+│     ├─ util.js           # 論理座標BOX・計算・HTMLエスケープ
+│     ├─ lessons.js        # 課題データ（§5.4）
+│     ├─ circle.js         # 円モジュール（描画・操作・キー入力）
+│     ├─ sphere.js         # 球モジュール（回転・スタンプ）
+│     ├─ state.js          # 状態・履歴（§5.3）
+│     ├─ ink.js            # 手書きCanvas
+│     ├─ export-image.js   # PNG保存
+│     ├─ ui-shell.js       # 画面遷移・共通UI・操作振り分け
+│     └─ main.js           # 起動
+├─ gas/
+│  ├─ Code.gs          # doGet で Index を配るだけ
+│  └─ Index.html       # 生成物（CSS・JS内蔵の1枚）
+├─ dist/
+│  └─ demo.html        # 生成物（モック版。ブラウザで開くだけ）
 └─ tests/
-   ├─ circle.test.js
-   └─ lesson-config.test.js
+   └─ check.mjs        # node で動く検査
 ```
+
+新しいモジュールは `src/js/` に1ファイルとして追加し、`lessons.js` の課題データと `src/index.html` の @include に1行ずつ足す。`ui-shell.js` の `renderWork` / `setupWorkSurface` が `module` 名で振り分ける。
 
 実際の既存リポジトリ構造がこの案と異なる場合は、既存のビルド・テスト方式を優先する。ただし、重い依存やフレームワークを追加する前に理由を報告する。
 
